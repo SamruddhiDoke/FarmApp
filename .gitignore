@@ -1,0 +1,1 @@
+"target/ *.class *.log node_modules/ dist/ build/ .idea/ .vscode/ *.iml .DS_Store Thumbs.db .env" 
