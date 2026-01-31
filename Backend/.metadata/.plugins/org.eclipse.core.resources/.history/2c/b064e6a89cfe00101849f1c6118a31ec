@@ -1,0 +1,12 @@
+spring.application.name=KrushiWeb 
+spring.datasource.url=jdbc:mysql://localhost:3307/farm
+spring.datasource.username=root
+spring.datasource.password=root
+spring.jpa.hibernate.ddl-auto=update
+spring.jpa.show-sql=true
+spring.mail.host=smtp.gmail.com
+spring.mail.port=587
+spring.mail.username=krushi.app25@gmail.com
+spring.mail.password=jkic jyhu icmz gsid
+spring.mail.properties.mail.smtp.auth=true
+spring.mail.properties.mail.smtp.starttls.enable=true

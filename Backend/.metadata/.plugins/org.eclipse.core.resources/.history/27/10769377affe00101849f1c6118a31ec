@@ -1,0 +1,37 @@
+package com.sam.controllers;
+
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import com.sam.dto.EquipmentCardDTO;
+import com.sam.models.Equipment;
+import com.sam.services.EquipmentService;
+
+@RestController
+@RequestMapping("/api/v1/equipment")
+@CrossOrigin("*")
+public class EquipmentController {
+
+    @Autowired
+    private EquipmentService equipmentService;
+
+    // Farmer lists equipment
+    @PostMapping("/add/{userId}")
+    public ResponseEntity<?> addEquipment(
+            @PathVariable Long userId,
+            @RequestBody Equipment equipment) {
+
+        return ResponseEntity.ok(equipmentService.addEquipment(userId, equipment));
+    }
+
+    // Buyers view nearby equipment
+    @GetMapping("/location")
+    public ResponseEntity<List<EquipmentCardDTO>> getByLocation(
+            @RequestParam String location) {
+
+        return ResponseEntity.ok(equipmentService.getEquipmentByLocation(location));
+    }
+}

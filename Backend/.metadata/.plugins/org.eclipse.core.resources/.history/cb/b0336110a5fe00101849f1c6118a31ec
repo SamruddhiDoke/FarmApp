@@ -1,0 +1,97 @@
+package com.sam.services;
+
+import java.time.LocalDateTime;
+import java.util.Optional;
+import java.util.Random;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+
+import com.sam.models.OtpVerification;
+import com.sam.models.User;
+import com.sam.repositories.OtpVerificationRepository;
+import com.sam.repositories.UserRepository;
+import com.sam.responseWrapper.MyResponseWrapper;
+
+@Service
+public class OtpVerificationService
+{
+	@Autowired
+	UserRepository userRepository;
+	
+	@Autowired
+	OtpVerificationRepository otpVerificationRepository;
+	
+	@Autowired
+	MyResponseWrapper responseWrapper;
+	
+	@Autowired
+	private JavaMailSender mailSender;
+	
+	public void generateAndSendOtp(String email) {
+        
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+
+        String otp = String.format("%06d", new Random().nextInt(999999));
+
+       
+        OtpVerification otpEntity = new OtpVerification();
+        otpEntity.setUser(user);
+        otpEntity.setOtpCode(otp);
+        otpEntity.setExpiresAt(LocalDateTime.now().plusMinutes(5));
+        otpEntity.setStatus("PENDING");
+
+        
+        otpVerificationRepository.save(otpEntity);
+
+        
+        sendOtpEmail(email, otp);
+    }
+
+
+
+    private void sendOtpEmail(String toEmail, String otp) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setTo(toEmail);
+        message.setSubject("Your OTP Code");
+        message.setText("Your OTP is: " + otp + "\nThis OTP will expire in 5 minutes.");
+        mailSender.send(message);
+    }
+
+    public boolean verifyOtp(String email, String otpCode) 
+    {
+
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        Optional<OtpVerification> otpOptional =
+                otpVerificationRepository.findByUserIdAndOtpCode(user.getId(), otpCode);
+
+        if (otpOptional.isPresent()) {
+            OtpVerification otp = otpOptional.get();
+
+            if (otp.getExpiresAt().isAfter(LocalDateTime.now())
+                    && otp.getStatus().equals("PENDING")) {
+
+                otp.setStatus("VERIFIED");
+                otpVerificationRepository.save(otp);
+
+                // 🔥 MARK USER AS VERIFIED
+                user.setVerified(true);
+                userRepository.save(user);
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    }
+
+
+
+}

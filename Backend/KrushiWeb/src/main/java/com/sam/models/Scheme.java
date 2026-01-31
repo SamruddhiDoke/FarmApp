@@ -1,0 +1,60 @@
+package com.sam.models;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+
+import jakarta.persistence.*;
+import lombok.*;
+
+@Entity
+@Table(name = "schemes")
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+public class Scheme {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(nullable = false)
+    private String title;
+
+    @Column(length = 300)
+    private String shortDescription;
+
+    @Column(length = 2000)
+    private String detailedSummary;
+
+    private String category;        
+    private String targetGroup;     
+    private String state;           
+    private String language;        
+
+    @Column(nullable = false)
+    private String officialUrl;
+
+    private String applyUrl;
+
+    private boolean active = true;
+
+    private LocalDate startDate;
+    private LocalDate endDate;
+
+    private LocalDateTime lastVerifiedAt;
+
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
+
+    @PrePersist
+    protected void onCreate() {
+        createdAt = LocalDateTime.now();
+        updatedAt = LocalDateTime.now();
+        lastVerifiedAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
+}

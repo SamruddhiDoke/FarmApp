@@ -1,0 +1,59 @@
+package com.sam.services;
+
+import java.util.Optional;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
+
+import com.sam.models.User;
+import com.sam.repositories.UserRepository;
+import com.sam.responseWrapper.MyResponseWrapper;
+
+@Service
+public class UserService 
+{
+    @Autowired
+    private UserRepository userRepository;
+    
+    public ResponseEntity<?> register(User user)
+    {
+        MyResponseWrapper responseWrapper = new MyResponseWrapper(); 
+        Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+        
+        if(existingUser.isPresent())
+        {
+            responseWrapper.setMessage("Email - "+ user.getEmail() + " already exists");
+            responseWrapper.setData(true);
+            return new ResponseEntity<>(responseWrapper, HttpStatus.CONFLICT);
+        }
+        else
+        {
+            User savedUser = userRepository.save(user);
+            responseWrapper.setMessage("Registration Success!");
+            responseWrapper.setData(savedUser);
+            return new ResponseEntity<>(responseWrapper, HttpStatus.CREATED);
+        }
+    }
+    
+    public ResponseEntity<?> login(String email, String password)
+    {
+        MyResponseWrapper responseWrapper = new MyResponseWrapper(); 
+        Optional<User> user = userRepository.findByEmailAndPassword(email, password);
+        
+        if(user.isPresent())
+        {
+            responseWrapper.setMessage("Login Success!");
+            responseWrapper.setData(user.get());
+            return new ResponseEntity<>(responseWrapper, HttpStatus.OK);
+        }
+        else
+        {
+            responseWrapper.setMessage("Wrong Credentials");
+            responseWrapper.setData(null);
+            return new ResponseEntity<>(responseWrapper, HttpStatus.NOT_FOUND);
+        }
+    }
+}
+

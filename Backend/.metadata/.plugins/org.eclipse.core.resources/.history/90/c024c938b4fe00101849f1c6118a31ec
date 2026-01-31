@@ -1,0 +1,5 @@
+package com.sam.config;
+
+public class ChatWebConfig {
+
+}

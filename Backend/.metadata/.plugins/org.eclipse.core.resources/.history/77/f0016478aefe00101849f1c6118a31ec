@@ -1,0 +1,18 @@
+@Entity
+@Table(name = "equipment_messages")
+public class EquipmentMessage {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    private String message;
+
+    @ManyToOne
+    private User sender;
+
+    @ManyToOne
+    private Equipment equipment;
+
+    private LocalDateTime sentAt;
+}
